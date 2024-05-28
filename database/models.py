@@ -34,6 +34,7 @@ class Channels(Base):
     __tablename__ = "channel"
     id = Column(Integer, primary_key=True, autoincrement=True)
     channel_url = Column(String, unique=True)
+    # channel_id = Column(Integer, unique=True)
     admins_channel = Column(Boolean, default=False)
 
 class AdminInfo(Base):

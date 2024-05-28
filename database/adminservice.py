@@ -111,3 +111,9 @@ def changerefs_db(id, amount):
         user = db.query(User).filter_by(tg_id=id).first()
         user.refs = amount
         db.commit()
+
+def get_all_refs_db(tg_id):
+    with next(get_db()) as db:
+        users = db.query(User).filter_by(invited_id=tg_id).all()
+        if users:
+            return [[user.user_name, user.tg_id, user.balance, user.refs, user.invited, user.paid] for user in users]

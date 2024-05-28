@@ -35,7 +35,7 @@ async def call_backs(query: CallbackQuery, state: FSMContext):
                                                                  f"Карта: <code>{i[3]}</code>\n"
                                                                  f"Банк: {i[4]}", parse_mode="html",
                                              reply_markup=await payments_action_in(i[0]))
-        elif active_payments != []:
+        elif active_payments == []:
             await query.bot.send_message(query.from_user.id, "Нет никаких заявок на выплату")
     elif query.data == "cancel":
         await query.bot.delete_message(chat_id=query.from_user.id, message_id=query.message.message_id)
@@ -111,6 +111,21 @@ async def change_refs(query: CallbackQuery, state: FSMContext):
                                  reply_markup= await cancel_bt())
     await state.set_state(ChangeAdminInfo.change_refs)
     await state.set_data({"user_id": id_of_user})
+@admin_router.callback_query(lambda call: "showrefs_" in call.data)
+async def showrefs(query: CallbackQuery):
+    id_of_user = int(query.data.replace("showrefs_", ""))
+    all_refs = get_all_refs_db(id_of_user)
+    if all_refs != []:
+        for user_info in all_refs:
+            await query.bot.send_message(query.from_user.id, f"📝Имя юзера: {user_info[0]}\n"
+                                                                 f"🆔ID юзера: <code>{user_info[1]}</code>\n"
+                                                                 f"👥 Пригласил: {user_info[3]}\n"
+                                                                 f"💳 Баланс юзера: {user_info[2]}\n"
+                                                                 f"📤Вывел {user_info[5]}\n",
+                                           parse_mode="html", reply_markup=await close_in())
+    elif all_refs == []:
+        await query.bot.send_message(query.from_user.id, f"У юзера <code>{id_of_user}</code> нет рефералов",
+                                     parse_mode="html")
 
 
 @admin_router.callback_query(lambda call: "accept_" in call.data)
@@ -122,7 +137,7 @@ async def acception(query: CallbackQuery):
     await query.bot.send_message(user_info[0], f"Ваша завявка на выплату {user_info[1]} была подтверждена ✅")
 
 @admin_router.callback_query(lambda call: "decline_" in call.data)
-async def acception(query: CallbackQuery):
+async def declined(query: CallbackQuery):
     id_of_wa = int(query.data.replace("decline_", ""))
     user_info = status_declined(id_of_wa)
     await query.bot.edit_message_reply_markup(chat_id=query.from_user.id, message_id=query.message.message_id,
@@ -220,7 +235,7 @@ async def mailing_admin(message: Message, state: FSMContext):
         for i in all_users:
             try:
                 await message.bot.copy_message(chat_id=i, from_chat_id=message.from_user.id,
-                                               message_id = message.message_id)
+                                               message_id = message.message_id, reply_markup=message.reply_markup)
                 success += 1
             except:
                 unsuccess +=1

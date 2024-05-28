@@ -48,3 +48,10 @@ def reg_withdrawals(tg_id, amount, card, bank):
         db.add(new_wa)
         db.commit()
 
+def check_for_wa(tg_id):
+    with next(get_db()) as db:
+        check = db.query(Withdrawals).filter_by(tg_id=tg_id, status="ожидание").first()
+        if check:
+            return True
+        return False
+

@@ -29,6 +29,21 @@ async def channels_in(all_channels):
     buttons.append([InlineKeyboardButton(text="Проверить подписки", callback_data="check_chan")])
     kb = InlineKeyboardMarkup(inline_keyboard=buttons)
     return kb
+# async def channels_in(all_channels):
+#     if len(all_channels) > 6:
+#         actual_channels = all_channels[0:6]
+#         buttons = [
+#             [InlineKeyboardButton(text="💎Спонсор", url=f"{i}")] for i in actual_channels
+#         ]
+#
+#         kb = InlineKeyboardMarkup(inline_keyboard=buttons)
+#         return kb
+#     buttons = [
+#         [InlineKeyboardButton(text="💎Спонсор", url=f"{i}")] for i in all_channels
+#     ]
+#     buttons.append([InlineKeyboardButton(text="Проверить подписки", callback_data="check_chan")])
+#     kb = InlineKeyboardMarkup(inline_keyboard=buttons)
+#     return kb
 async def admin_in(admin_user):
     buttons = [
         [InlineKeyboardButton(text="🧑‍💻Админ", url=f"t.me/{admin_user.replace('@', '')}")]
@@ -51,7 +66,8 @@ async def admin_menu_in():
          InlineKeyboardButton(text="💳Выплаты", callback_data="all_payments")],
         [InlineKeyboardButton(text="💰Изменить награду за рефа", callback_data="change_money")],
         [InlineKeyboardButton(text="📕Изменить минимальный вывод", callback_data="change_min")],
-        [InlineKeyboardButton(text="📧Обязательные подписки", callback_data="change_channels")]
+        [InlineKeyboardButton(text="📧Обязательные подписки", callback_data="change_channels")],
+        [InlineKeyboardButton(text="Закрыть", callback_data="cancel")]
     ]
     kb = InlineKeyboardMarkup(inline_keyboard=buttons)
     return kb
@@ -92,6 +108,7 @@ async def imp_menu_in(id, status):
             [InlineKeyboardButton(text="➕Баланс вывода", callback_data=f"addbalance_{id}"),
              InlineKeyboardButton(text="✏️Баланс вывода", callback_data=f"changebalance_{id}")],
             [InlineKeyboardButton(text="✏️Количество рефералов", callback_data=f"changerefs_{id}")],
+            [InlineKeyboardButton(text="🔍Посмотреть рефералов", callback_data=f"showrefs_{id}")]
             [InlineKeyboardButton(text="Закрыть", callback_data="cancel")]
 
         ]
@@ -104,5 +121,17 @@ async def imp_menu_in(id, status):
             [InlineKeyboardButton(text="Закрыть", callback_data="cancel")]
 
         ]
+    kb = InlineKeyboardMarkup(inline_keyboard=buttons)
+    return kb
+async def close_in():
+    buttons = [
+        [InlineKeyboardButton(text="Закрыть", callback_data="cancel")]
+    ]
+    kb = InlineKeyboardMarkup(inline_keyboard=buttons)
+    return kb
+async def universal_in(text, url):
+    buttons = [
+        [InlineKeyboardButton(text=f"{text}", callback_data=f"{url}")]
+    ]
     kb = InlineKeyboardMarkup(inline_keyboard=buttons)
     return kb

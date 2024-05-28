@@ -40,7 +40,7 @@ def add_admin_info():
 def count_info():
     with next(get_db()) as db:
         users = db.query(User).count()
-        wa = db.query(Withdrawals).filter_by(status="выведено").all()
+        wa = db.query(Withdrawals).filter_by(status="принята").all()
         amount = 0
         try:
             for i in wa:

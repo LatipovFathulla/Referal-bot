@@ -15,6 +15,7 @@ async def check_channels(message):
     for i in all_channels:
         try:
             check = await message.bot.get_chat_member(f"{i}", user_id=message.from_user.id)
+            print("Проверил")
             if check.status in ["left"]:
                 await message.bot.send_message(chat_id=message.from_user.id,
                                                text="Для использования бота подпишитесь на наших спонсоров",
@@ -22,6 +23,7 @@ async def check_channels(message):
                 return False
 
         except:
+            print("Не проверил")
             pass
     return True
 async def banned(message):
@@ -57,7 +59,7 @@ async def start(message: Message, command: BotCommand = None):
         add_user(user_name=message.from_user.first_name, tg_id=message.from_user.id)
         await message.bot.send_message(message.from_user.id, f"🎉Привет, {message.from_user.first_name}",
                                        reply_markup= await main_menu_bt())
-    if channels_checker and checker_banned and checker:
+    elif channels_checker and checker_banned and checker:
         await message.bot.send_message(message.from_user.id, f"🎉Привет, {message.from_user.first_name}",
                                        reply_markup= await main_menu_bt())
 
@@ -108,8 +110,12 @@ async def call_backs(query: CallbackQuery, state: FSMContext):
     if query.data == "payment":
         balance = get_user_info_db(query.from_user.id)[2]
         min_amount = get_actual_min_amount()
+        check_wa = check_for_wa(query.from_user.id)
         if balance < min_amount:
             await query.message.bot.answer_callback_query(query.id, text=f"🚫Минимальная сумма вывода: {min_amount}",
+                                                          show_alert=True)
+        elif check_wa:
+            await query.message.bot.answer_callback_query(query.id, text="⏳Вы уже оставили заявку. Ожидайте",
                                                           show_alert=True)
         elif balance >= min_amount:
             await query.bot.send_message(query.from_user.id, "💳Введите номер вашей карты", reply_markup= await cancel_bt())

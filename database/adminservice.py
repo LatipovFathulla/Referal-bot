@@ -117,3 +117,4 @@ def get_all_refs_db(tg_id):
         users = db.query(User).filter_by(invited_id=tg_id).all()
         if users:
             return [[user.user_name, user.tg_id, user.balance, user.refs, user.invited, user.paid] for user in users]
+        return []

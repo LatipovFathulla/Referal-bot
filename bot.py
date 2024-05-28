@@ -15,7 +15,6 @@ async def check_channels(message):
     for i in all_channels:
         try:
             check = await message.bot.get_chat_member(f"{i}", user_id=message.from_user.id)
-            print("Проверил")
             if check.status in ["left"]:
                 await message.bot.send_message(chat_id=message.from_user.id,
                                                text="Для использования бота подпишитесь на наших спонсоров",
@@ -23,7 +22,6 @@ async def check_channels(message):
                 return False
 
         except:
-            print("Не проверил")
             pass
     return True
 async def banned(message):

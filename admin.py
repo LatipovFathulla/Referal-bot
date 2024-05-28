@@ -186,7 +186,8 @@ async def get_new_channel(message: Message, state: FSMContext):
         try:
             new_channel = add_new_channel_db(message.text)
             if new_channel:
-                await message.bot.send_message(message.from_user.id, f"Подписка добавлена ✅",
+                await message.bot.send_message(message.from_user.id, f"Подписка добавлена ✅"
+                                                                     f"❗️Не забудьте добавить бота в этот канал/группу и дать ему админку(права давать не обязательно)❗️",
                                                reply_markup=await main_menu_bt())
                 await state.clear()
             else:

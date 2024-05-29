@@ -1,9 +1,8 @@
 from aiogram import Router, F
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message, BotCommand, CallbackQuery
+from aiogram.types import Message, CallbackQuery
 from buttons import *
-from database.otherservice import *
 from database.userservice import *
 from database.adminservice import *
 from states import ChangeAdminInfo
@@ -14,6 +13,7 @@ admin_router = Router()
 
 @admin_router.message(Command(commands=["admin"]))
 async def admin_mm(message: Message):
+    # TODO проверку админа после добавления админа
     # if message.from_user.id == admin_id:
     info = admin_menu_info()
     await message.bot.send_message(message.from_user.id, f"🕵️‍<b>️Пользователей в боте</b>: {info[0]}\n"
@@ -55,19 +55,20 @@ async def call_backs(query: CallbackQuery, state: FSMContext):
         all_channels = get_channels_for_admin()
         for i in all_channels:
             text += (f"\nАйди подписки: {i[0]}\n"
-                     f"Username канала: {i[1]}\n")
+                     f"Username канала: {i[1]}\n"
+                     f"ID канала: {i[2]}\n")
         await query.bot.send_message(query.from_user.id, text=text,
                                      reply_markup=await admin_channels_in())
     elif query.data == "add_channel":
-        await query.bot.send_message(query.from_user.id, "Введите username канала через @",
-                                     reply_markup= await cancel_bt())
-        await state.set_state(ChangeAdminInfo.get_channel)
+        await query.bot.send_message(query.from_user.id, "Введите ссылку на канал (формат: t.me/)",
+                                     reply_markup=await cancel_bt())
+        await state.set_state(ChangeAdminInfo.get_channel_url)
     elif query.data == "delete_channel":
         await query.bot.send_message(query.from_user.id, "Введите ID подписки для удаления",
                                      reply_markup=await cancel_bt())
         await state.set_state(ChangeAdminInfo.delete_channel)
     elif query.data == "mailing":
-        await query.bot.send_message(query.from_user.id, "Введите сообщение для рассылки, либо отправьте фотографии с описанием",
+        await query.bot.send_message(query.from_user.id, "Введите сообщение для рассылки, либо отправьте фотографии/видео с описанием",
                                      reply_markup=await cancel_bt())
         await state.set_state(ChangeAdminInfo.mailing)
     elif query.data == "imp":
@@ -177,26 +178,38 @@ async def get_new_min(message: Message, state: FSMContext):
     else:
         await message.bot.send_message(message.from_user.id, "️️❗Ошибка", reply_markup=await main_menu_bt())
         await state.clear()
-@admin_router.message(ChangeAdminInfo.get_channel)
-async def get_new_channel(message: Message, state: FSMContext):
+@admin_router.message(ChangeAdminInfo.get_channel_url)
+async def get_new_channel_url(message: Message, state: FSMContext):
+    if message.text == "❌Отменить":
+        await message.bot.send_message(message.from_user.id, "🚫Действие отменено", reply_markup=await main_menu_bt())
+        await state.clear()
+    elif message.text:
+        await state.set_data({"chan_url": message.text})
+        await message.bot.send_message(message.from_user.id, "Введите ID канала", reply_markup=await cancel_bt())
+        await state.set_state(ChangeAdminInfo.get_channel_id)
+    else:
+        await message.bot.send_message(message.from_user.id, "️️❗Ошибка", reply_markup=await main_menu_bt())
+        await state.clear()
+@admin_router.message(ChangeAdminInfo.get_channel_id)
+async def get_new_channel_id(message: Message, state: FSMContext):
     if message.text == "❌Отменить":
         await message.bot.send_message(message.from_user.id, "🚫Действие отменено", reply_markup=await main_menu_bt())
         await state.clear()
     elif message.text:
         try:
-            new_channel = add_new_channel_db(message.text)
+            chanel_url = await state.get_data()
+            new_channel = add_new_channel_db(url=chanel_url["chan_url"], id=int(message.text))
             if new_channel:
-                await message.bot.send_message(message.from_user.id, f"Подписка добавлена ✅"
+                await message.bot.send_message(message.from_user.id, f"Подписка добавлена ✅\n"
                                                                      f"❗️Не забудьте добавить бота в этот канал/группу и дать ему админку(права давать не обязательно)❗️",
                                                reply_markup=await main_menu_bt())
                 await state.clear()
             else:
-                await message.bot.send_message(message.from_user.id, f"Подписка не добавлена. Нельзя добавить более 6 обязательных подписок\n"
-                                                                     f"Чтобы добавить новую, удалите старую подписку",
+                await message.bot.send_message(message.from_user.id, f"Подписка не добавлена.",
                                                reply_markup=await main_menu_bt())
                 await state.clear()
         except:
-            await message.bot.send_message(message.from_user.id, "🚫Не удалось изменить",
+            await message.bot.send_message(message.from_user.id, "🚫Не удалось добавить подписку. Данная подписка уже существует",
                                            reply_markup=await main_menu_bt())
             await state.clear()
     else:
@@ -266,12 +279,11 @@ async def get_imp_id(message: Message, state: FSMContext):
                                                parse_mode="html", reply_markup=await imp_menu_in(user_info[1], status))
                 await state.clear()
             else:
-                await message.bot.send_message(message.from_user.id, f"Подписка не добавлена. Нельзя добавить более 6 обязательных подписок\n"
-                                                                     f"Чтобы добавить новую, удалите старую подписку",
+                await message.bot.send_message(message.from_user.id, f"Юзер не найден",
                                                reply_markup=await main_menu_bt())
                 await state.clear()
         except:
-            await message.bot.send_message(message.from_user.id, "🚫Не удалось изменить",
+            await message.bot.send_message(message.from_user.id, "🚫Не удалось найти юзера",
                                            reply_markup=await main_menu_bt())
             await state.clear()
     else:

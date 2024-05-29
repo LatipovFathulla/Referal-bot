@@ -1,5 +1,6 @@
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
-
+from aiogram.types import (ReplyKeyboardMarkup, KeyboardButton,
+                           InlineKeyboardMarkup, InlineKeyboardButton)
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 async def main_menu_bt():
     buttons = [
         [KeyboardButton(text="💸Заработать"), KeyboardButton(text="📱Профиль")],
@@ -15,35 +16,43 @@ async def payment_in():
     kb = InlineKeyboardMarkup(inline_keyboard=buttons)
     return kb
 async def channels_in(all_channels):
-    if len(all_channels) > 6:
-        actual_channels = all_channels[0:6]
-        buttons = [
-            [InlineKeyboardButton(text="💎Спонсор", url=f"t.me/{i.replace('@', '')}")] for i in actual_channels
-        ]
-
-        kb = InlineKeyboardMarkup(inline_keyboard=buttons)
-        return kb
-    buttons = [
-        [InlineKeyboardButton(text="💎Спонсор", url=f"t.me/{i.replace('@', '')}")] for i in all_channels
-    ]
-    buttons.append([InlineKeyboardButton(text="Проверить подписки", callback_data="check_chan")])
-    kb = InlineKeyboardMarkup(inline_keyboard=buttons)
+    keyboard_builder = InlineKeyboardBuilder()
+    for i in all_channels:
+        keyboard_builder.add(InlineKeyboardButton(text="💎Спонсор", url=f"{i[1]}"))
+    keyboard_builder.row(InlineKeyboardButton(text="Проверить подписки", callback_data="check_chan"))
+    if len(all_channels) < 6:
+        keyboard_builder.adjust(1)
+    elif len(all_channels) > 6 <= 12:
+        keyboard_builder.adjust(2)
+    elif len(all_channels) > 12 <= 24:
+        keyboard_builder.adjust(3)
+    elif len(all_channels) > 24 <= 48:
+        keyboard_builder.adjust(4)
+    elif len(all_channels) > 48 <= 96:
+        keyboard_builder.adjust(5)
+    else:
+        keyboard_builder.adjust(6)
+    kb = keyboard_builder.as_markup()
     return kb
+
+#
 # async def channels_in(all_channels):
 #     if len(all_channels) > 6:
 #         actual_channels = all_channels[0:6]
 #         buttons = [
-#             [InlineKeyboardButton(text="💎Спонсор", url=f"{i}")] for i in actual_channels
+#             [InlineKeyboardButton(text="💎Спонсор", url=f"{i[1]}")] for i in actual_channels
 #         ]
 #
 #         kb = InlineKeyboardMarkup(inline_keyboard=buttons)
+#
 #         return kb
 #     buttons = [
-#         [InlineKeyboardButton(text="💎Спонсор", url=f"{i}")] for i in all_channels
+#         [InlineKeyboardButton(text="💎Спонсор", url=f"{i[1]}")] for i in all_channels
 #     ]
 #     buttons.append([InlineKeyboardButton(text="Проверить подписки", callback_data="check_chan")])
 #     kb = InlineKeyboardMarkup(inline_keyboard=buttons)
 #     return kb
+
 async def admin_in(admin_user):
     buttons = [
         [InlineKeyboardButton(text="🧑‍💻Админ", url=f"t.me/{admin_user.replace('@', '')}")]
@@ -108,7 +117,7 @@ async def imp_menu_in(id, status):
             [InlineKeyboardButton(text="➕Баланс вывода", callback_data=f"addbalance_{id}"),
              InlineKeyboardButton(text="✏️Баланс вывода", callback_data=f"changebalance_{id}")],
             [InlineKeyboardButton(text="✏️Количество рефералов", callback_data=f"changerefs_{id}")],
-            [InlineKeyboardButton(text="🔍Посмотреть рефералов", callback_data=f"showrefs_{id}")]
+            [InlineKeyboardButton(text="🔍Посмотреть рефералов", callback_data=f"showrefs_{id}")],
             [InlineKeyboardButton(text="Закрыть", callback_data="cancel")]
 
         ]

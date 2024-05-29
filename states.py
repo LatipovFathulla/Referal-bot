@@ -7,7 +7,8 @@ class PaymentState(StatesGroup):
 class ChangeAdminInfo(StatesGroup):
     get_amount = State()
     get_min = State()
-    get_channel = State()
+    get_channel_id = State()
+    get_channel_url = State()
     delete_channel = State()
     mailing = State()
     imp = State()

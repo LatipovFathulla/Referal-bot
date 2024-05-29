@@ -11,18 +11,19 @@ from states import PaymentState
 bot_router = Router()
 
 async def check_channels(message):
-    all_channels = get_channels()
-    for i in all_channels:
-        try:
-            check = await message.bot.get_chat_member(f"{i}", user_id=message.from_user.id)
-            if check.status in ["left"]:
-                await message.bot.send_message(chat_id=message.from_user.id,
-                                               text="Для использования бота подпишитесь на наших спонсоров",
-                                               reply_markup=await channels_in(all_channels))
-                return False
+    all_channels = get_channels_for_check()
+    if all_channels != []:
+        for i in all_channels:
+            try:
+                check = await message.bot.get_chat_member(i[0], user_id=message.from_user.id)
+                if check.status in ["left"]:
+                    await message.bot.send_message(chat_id=message.from_user.id,
+                                                   text="Для использования бота подпишитесь на наших спонсоров",
+                                                   reply_markup=await channels_in(all_channels))
+                    return False
 
-        except:
-            pass
+            except:
+                pass
     return True
 async def banned(message):
     check = check_ban(message.from_user.id)

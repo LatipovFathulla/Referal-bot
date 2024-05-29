@@ -121,10 +121,10 @@ async def showrefs(query: CallbackQuery):
     try:
         file = convert_to_excel(id_of_user)
         document = FSInputFile(file)
-        await query.bot.send_document(admin_id, document)
+        await query.bot.send_document(query.message.message_id, document)
         os.remove(file)
     except:
-        await query.bot.send_message(admin_id, "Произошла ошибка")
+        await query.bot.send_message(query.message.message_id, "Произошла ошибка")
 
 @admin_router.callback_query(lambda call: "accept_" in call.data)
 async def acception(query: CallbackQuery):

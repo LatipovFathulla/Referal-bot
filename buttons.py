@@ -18,7 +18,10 @@ async def payment_in():
 async def channels_in(all_channels):
     keyboard_builder = InlineKeyboardBuilder()
     for i in all_channels:
-        keyboard_builder.button(text="💎Спонсор", url=i[1])
+        try:
+            keyboard_builder.button(text="💎Спонсор", url=i[1])
+        except:
+            pass
     keyboard_builder.button(text="Проверить подписки", callback_data="check_chan")
     if len(all_channels) < 6:
         keyboard_builder.adjust(1)

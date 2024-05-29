@@ -180,7 +180,7 @@ async def get_new_channel_url(message: Message, state: FSMContext):
     if message.text == "❌Отменить":
         await message.bot.send_message(message.from_user.id, "🚫Действие отменено", reply_markup=await main_menu_bt())
         await state.clear()
-    elif message.text:
+    elif "t.me/" in message.text or "https://t.me/" in message.text:
         await state.set_data({"chan_url": message.text})
         await message.bot.send_message(message.from_user.id, "Введите ID канала\n"
                                                              "Узнать ID можно переслав любой "
@@ -189,7 +189,7 @@ async def get_new_channel_url(message: Message, state: FSMContext):
                                        reply_markup=await cancel_bt())
         await state.set_state(ChangeAdminInfo.get_channel_id)
     else:
-        await message.bot.send_message(message.from_user.id, "️️❗Ошибка", reply_markup=await main_menu_bt())
+        await message.bot.send_message(message.from_user.id, "️️❗Ошибка! Введите корректную ссылку", reply_markup=await main_menu_bt())
         await state.clear()
 @admin_router.message(ChangeAdminInfo.get_channel_id)
 async def get_new_channel_id(message: Message, state: FSMContext):

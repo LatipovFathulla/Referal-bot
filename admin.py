@@ -6,6 +6,9 @@ from buttons import *
 from database.userservice import *
 from database.adminservice import *
 from states import ChangeAdminInfo
+from excel_converter import convert_to_excel
+import os
+from aiogram.types.input_file import FSInputFile
 
 # TODO изменить метод получения айди админа
 admin_id = 305896408
@@ -115,19 +118,13 @@ async def change_refs(query: CallbackQuery, state: FSMContext):
 @admin_router.callback_query(lambda call: "showrefs_" in call.data)
 async def showrefs(query: CallbackQuery):
     id_of_user = int(query.data.replace("showrefs_", ""))
-    all_refs = get_all_refs_db(id_of_user)
-    if all_refs != []:
-        for user_info in all_refs:
-            await query.bot.send_message(query.from_user.id, f"📝Имя юзера: {user_info[0]}\n"
-                                                                 f"🆔ID юзера: <code>{user_info[1]}</code>\n"
-                                                                 f"👥 Пригласил: {user_info[3]}\n"
-                                                                 f"💳 Баланс юзера: {user_info[2]}\n"
-                                                                 f"📤Вывел {user_info[5]}\n",
-                                           parse_mode="html", reply_markup=await close_in())
-    elif all_refs == []:
-        await query.bot.send_message(query.from_user.id, f"У юзера <code>{id_of_user}</code> нет рефералов",
-                                     parse_mode="html")
-
+    try:
+        file = convert_to_excel(id_of_user)
+        document = FSInputFile(file)
+        await query.bot.send_document(admin_id, document)
+        os.remove(file)
+    except:
+        await query.bot.send_message(admin_id, "Произошла ошибка")
 
 @admin_router.callback_query(lambda call: "accept_" in call.data)
 async def acception(query: CallbackQuery):
@@ -185,7 +182,11 @@ async def get_new_channel_url(message: Message, state: FSMContext):
         await state.clear()
     elif message.text:
         await state.set_data({"chan_url": message.text})
-        await message.bot.send_message(message.from_user.id, "Введите ID канала", reply_markup=await cancel_bt())
+        await message.bot.send_message(message.from_user.id, "Введите ID канала\n"
+                                                             "Узнать ID можно переслав любой "
+                                                             "пост из канала-спонсора в бот @getmyid_bot. "
+                                                             "После скопируйте результат из графы 'Forwarded from chat:'",
+                                       reply_markup=await cancel_bt())
         await state.set_state(ChangeAdminInfo.get_channel_id)
     else:
         await message.bot.send_message(message.from_user.id, "️️❗Ошибка", reply_markup=await main_menu_bt())
@@ -269,9 +270,14 @@ async def get_imp_id(message: Message, state: FSMContext):
         try:
             status = check_ban(user_id)
             user_info = get_user_info_db(user_id)
-            print(user_info)
             if user_info:
-                await message.bot.send_message(message.from_user.id, f"📝Имя юзера: {user_info[0]}\n"
+                user_name = "@"
+                try:
+                    chat = await message.bot.get_chat(user_info[1])
+                    user_name += f"{chat.username}"
+                except:
+                    pass
+                await message.bot.send_message(message.from_user.id, f"📝Имя юзера: {user_info[0]} {user_name}\n"
                                                                      f"🆔ID юзера: <code>{user_info[1]}</code>\n"
                                                                      f"👥 Пригласил: {user_info[3]}\n"
                                                                      f"💳 Баланс юзера: {user_info[2]}\n"

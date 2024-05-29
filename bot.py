@@ -7,7 +7,8 @@ from buttons import *
 from database.otherservice import *
 from database.userservice import *
 from states import PaymentState
-
+# TODO изменить метод получения айди админа
+admin_id = 305896408
 bot_router = Router()
 
 async def check_channels(message):
@@ -151,7 +152,13 @@ async def get_bank(message: Message, state: FSMContext):
         balance = get_user_info_db(message.from_user.id)[2]
         await message.bot.send_message(message.from_user.id, "✅Заявка на выплату принята. Ожидайте ответ",
                                        reply_markup= await main_menu_bt())
-        reg_withdrawals(tg_id=message.from_user.id, amount=balance, card=card.get('card'), bank=bank)
+        i = reg_withdrawals(tg_id=message.from_user.id, amount=balance, card=card.get('card'), bank=bank)
+        await message.bot.send_message(admin_id, f"<b>Заявка на выплату № {i[0]}</b>\n"
+                                                 f"ID: <code>{i[1]}</code>\n"
+                                                 f"Сумма выплаты: {i[2]}\n"
+                                                 f"Карта: <code>{i[3]}</code>\n"
+                                                 f"Банк: {i[4]}", parse_mode="html",
+                                       reply_markup=await payments_action_in(i[0]))
         await state.clear()
     else:
         await message.bot.send_message(message.from_user.id, "️️❗Ошибка", reply_markup= await main_menu_bt())

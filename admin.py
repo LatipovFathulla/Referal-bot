@@ -97,14 +97,14 @@ async def banning(query: CallbackQuery):
 @admin_router.callback_query(lambda call: "changebalance_" in call.data)
 async def change_balance(query: CallbackQuery, state: FSMContext):
     id_of_user = int(query.data.replace("changebalance_", ""))
-    await query.bot.send_message(query.from_user.id, "Введите новую сумму баланса",
+    await query.bot.send_message(query.from_user.id, "Введите новую сумму баланса. Для нецелых чисел используейте точку, а не запятую",
                                  reply_markup= await cancel_bt())
     await state.set_state(ChangeAdminInfo.change_balance)
     await state.set_data({"user_id": id_of_user})
 @admin_router.callback_query(lambda call: "addbalance_" in call.data)
 async def add_balance(query: CallbackQuery, state: FSMContext):
     id_of_user = int(query.data.replace("addbalance_", ""))
-    await query.bot.send_message(query.from_user.id, "Сколько нужно добавить к балансу?",
+    await query.bot.send_message(query.from_user.id, "Сколько нужно добавить к балансу? Для нецелых чисел используейте точку, а не запятую.",
                                  reply_markup= await cancel_bt())
     await state.set_state(ChangeAdminInfo.add_balance)
     await state.set_data({"user_id": id_of_user})
@@ -121,10 +121,10 @@ async def showrefs(query: CallbackQuery):
     try:
         file = convert_to_excel(id_of_user)
         document = FSInputFile(file)
-        await query.bot.send_document(query.message.message_id, document)
+        await query.bot.send_document(query.from_user.id, document)
         os.remove(file)
     except:
-        await query.bot.send_message(query.message.message_id, "Произошла ошибка")
+        await query.bot.send_message(query.from_user.id, "Произошла ошибка")
 
 @admin_router.callback_query(lambda call: "accept_" in call.data)
 async def acception(query: CallbackQuery):
@@ -199,7 +199,10 @@ async def get_new_channel_id(message: Message, state: FSMContext):
     elif message.text:
         try:
             chanel_url = await state.get_data()
-            new_channel = add_new_channel_db(url=chanel_url["chan_url"], id=int(message.text))
+            channel_id = int(message.text)
+            if channel_id > 0:
+                channel_id *= -1
+            new_channel = add_new_channel_db(url=chanel_url["chan_url"], id=channel_id)
             if new_channel:
                 await message.bot.send_message(message.from_user.id, f"Подписка добавлена ✅\n"
                                                                      f"❗️Не забудьте добавить бота в этот канал/группу и дать ему админку(права давать не обязательно)❗️",
@@ -301,7 +304,7 @@ async def add_balance_amount(message: Message, state: FSMContext):
     if message.text == "❌Отменить":
         await message.bot.send_message(message.from_user.id, "🚫Действие отменено", reply_markup=await main_menu_bt())
         await state.clear()
-    elif message.text.isdigit():
+    elif message.text:
         try:
             amount = float(message.text)
             user_id = await state.get_data()
@@ -327,7 +330,7 @@ async def change_balance_amount(message: Message, state: FSMContext):
     if message.text == "❌Отменить":
         await message.bot.send_message(message.from_user.id, "🚫Действие отменено", reply_markup=await main_menu_bt())
         await state.clear()
-    elif message.text.isdigit():
+    elif message.text:
         try:
             amount = float(message.text)
             user_id = await state.get_data()
@@ -348,7 +351,7 @@ async def change_refs_amount(message: Message, state: FSMContext):
     if message.text == "❌Отменить":
         await message.bot.send_message(message.from_user.id, "🚫Действие отменено", reply_markup=await main_menu_bt())
         await state.clear()
-    elif message.text.isdigit():
+    elif message.text:
         try:
             amount = float(message.text)
             user_id = await state.get_data()

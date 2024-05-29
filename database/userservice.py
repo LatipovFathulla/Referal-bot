@@ -47,7 +47,8 @@ def reg_withdrawals(tg_id, amount, card, bank):
         new_wa = Withdrawals(tg_id=tg_id, amount=amount, card=card, bank=bank)
         db.add(new_wa)
         db.commit()
-    return [new_wa.id, new_wa.tg_id, new_wa.amount, new_wa.card, new_wa.bank]
+        wda = db.query(Withdrawals).filter_by(status="ожидание", tg_id=tg_id).first()
+    return [wda.id, wda.tg_id, wda.amount, wda.card, wda.bank]
 
 def check_for_wa(tg_id):
     with next(get_db()) as db:

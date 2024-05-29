@@ -11,7 +11,7 @@ from database.otherservice import *
 # TODO это нужно убрать после теста
 try:
     add_admin_info()
-    add_channel("@refer_jabyum", -1002201370044)
+    add_channel("t.me/refer_jabyum", -1002201370044)
 except:
     pass
 

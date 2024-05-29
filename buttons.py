@@ -18,8 +18,8 @@ async def payment_in():
 async def channels_in(all_channels):
     keyboard_builder = InlineKeyboardBuilder()
     for i in all_channels:
-        keyboard_builder.add(InlineKeyboardButton(text="💎Спонсор", url=f"{i[1]}"))
-    keyboard_builder.row(InlineKeyboardButton(text="Проверить подписки", callback_data="check_chan"))
+        keyboard_builder.button(text="💎Спонсор", url=i[1])
+    keyboard_builder.button(text="Проверить подписки", callback_data="check_chan")
     if len(all_channels) < 6:
         keyboard_builder.adjust(1)
     elif len(all_channels) > 6 <= 12:
@@ -32,8 +32,7 @@ async def channels_in(all_channels):
         keyboard_builder.adjust(5)
     else:
         keyboard_builder.adjust(6)
-    kb = keyboard_builder.as_markup()
-    return kb
+    return keyboard_builder.as_markup()
 
 #
 # async def channels_in(all_channels):

@@ -57,18 +57,18 @@ async def call_backs(query: CallbackQuery, state: FSMContext):
         text = "Обязательные подписки: \n"
         all_channels = get_channels_for_admin()
         for i in all_channels:
-            text += (f"\nАйди подписки: {i[0]}\n"
+            text += (f"\nАйди <b>подписки</b>: {i[0]}\n"
                      f"Username канала: {i[1]}\n"
                      f"ID канала: {i[2]}\n")
         await query.bot.send_message(query.from_user.id, text=text,
-                                     reply_markup=await admin_channels_in())
+                                     reply_markup=await admin_channels_in(), parse_mode="html")
     elif query.data == "add_channel":
-        await query.bot.send_message(query.from_user.id, "Введите ссылку на канал (формат: t.me/)",
+        await query.bot.send_message(query.from_user.id, "Введите ссылку на канал (формат: t.me/ или https://t.me/)",
                                      reply_markup=await cancel_bt())
         await state.set_state(ChangeAdminInfo.get_channel_url)
     elif query.data == "delete_channel":
-        await query.bot.send_message(query.from_user.id, "Введите ID подписки для удаления",
-                                     reply_markup=await cancel_bt())
+        await query.bot.send_message(query.from_user.id, "Введите ID <b>подписки</b> для удаления",
+                                     reply_markup=await cancel_bt(), parse_mode="html")
         await state.set_state(ChangeAdminInfo.delete_channel)
     elif query.data == "mailing":
         await query.bot.send_message(query.from_user.id, "Введите сообщение для рассылки, либо отправьте фотографии/видео с описанием",
@@ -180,7 +180,7 @@ async def get_new_channel_url(message: Message, state: FSMContext):
     if message.text == "❌Отменить":
         await message.bot.send_message(message.from_user.id, "🚫Действие отменено", reply_markup=await main_menu_bt())
         await state.clear()
-    elif "t.me/" in message.text or "https://t.me/" in message.text:
+    elif "t.me/" in message.text.lower() or "https://t.me/" in message.text.lower():
         await state.set_data({"chan_url": message.text})
         await message.bot.send_message(message.from_user.id, "Введите ID канала\n"
                                                              "Узнать ID можно переслав любой "

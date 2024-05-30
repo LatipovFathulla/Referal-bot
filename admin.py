@@ -57,7 +57,7 @@ async def call_backs(query: CallbackQuery, state: FSMContext):
         text = "Обязательные подписки: \n"
         all_channels = get_channels_for_admin()
         for i in all_channels:
-            text += (f"\nАйди <b>подписки</b>: {i[0]}\n"
+            text += (f"\nАйди <b>ПОДПИСКИ</b>: {i[0]}\n"
                      f"Username канала: {i[1]}\n"
                      f"ID канала: {i[2]}\n")
         await query.bot.send_message(query.from_user.id, text=text,
@@ -67,7 +67,7 @@ async def call_backs(query: CallbackQuery, state: FSMContext):
                                      reply_markup=await cancel_bt())
         await state.set_state(ChangeAdminInfo.get_channel_url)
     elif query.data == "delete_channel":
-        await query.bot.send_message(query.from_user.id, "Введите ID <b>подписки</b> для удаления",
+        await query.bot.send_message(query.from_user.id, "Введите ID <b>ПОДПИСКИ</b> для удаления",
                                      reply_markup=await cancel_bt(), parse_mode="html")
         await state.set_state(ChangeAdminInfo.delete_channel)
     elif query.data == "mailing":

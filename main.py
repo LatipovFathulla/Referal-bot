@@ -3,7 +3,8 @@ import asyncio
 from bot import bot_router
 from admin import admin_router
 from database import Base, engine
-bot = Bot(token="7153700160:AAEG1I8IpDQBdbQTf6w0uk4whSq6auyZtMQ")
+# TODO токен
+bot = Bot(token="TOKEN")
 dp = Dispatcher()
 Base.metadata.create_all(bind=engine)
 from database.otherservice import *

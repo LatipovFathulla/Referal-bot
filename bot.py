@@ -8,7 +8,7 @@ from database.otherservice import *
 from database.userservice import *
 from states import PaymentState
 # TODO изменить метод получения айди админа
-admin_id = 305896408
+admin_id = 558618720
 bot_router = Router()
 
 async def check_channels(message):

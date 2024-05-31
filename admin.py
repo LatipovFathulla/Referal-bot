@@ -10,18 +10,19 @@ from excel_converter import convert_to_excel
 import os
 from aiogram.types.input_file import FSInputFile
 
+
 # TODO изменить метод получения айди админа
-admin_id = 305896408
+admin_id = 558618720
 admin_router = Router()
 
 @admin_router.message(Command(commands=["admin"]))
 async def admin_mm(message: Message):
     # TODO проверку админа после добавления админа
-    # if message.from_user.id == admin_id:
-    info = admin_menu_info()
-    await message.bot.send_message(message.from_user.id, f"🕵️‍<b>️Пользователей в боте</b>: {info[0]}\n"
-                                                         f"💶<b>Заявок на вывод</b>: {info[1]}", parse_mode="html",
-                                   reply_markup= await admin_menu_in())
+    if message.from_user.id == admin_id:
+        info = admin_menu_info()
+        await message.bot.send_message(message.from_user.id, f"🕵️‍<b>️Пользователей в боте</b>: {info[0]}\n"
+                                                             f"💶<b>Заявок на вывод</b>: {info[1]}", parse_mode="html",
+                                       reply_markup= await admin_menu_in())
 
 @admin_router.callback_query(F.data.in_(["all_payments", "cancel", "none", "change_money", "change_min",
                                          "change_channels", "add_channel", "delete_channel", "mailing",

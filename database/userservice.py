@@ -56,4 +56,11 @@ def check_for_wa(tg_id):
         if check:
             return True
         return False
+def get_admin_user():
+    with next(get_db()) as db:
+        check = db.query(AdminInfo).first()
+        if check:
+            return check.admin_channel
+        return ""
+
 

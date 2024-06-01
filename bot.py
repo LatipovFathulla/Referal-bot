@@ -97,7 +97,7 @@ async def info(message: Message):
     if channels_checker and checker_banned:
         all_info = count_info()
         # TODO изменить на юзернейм админа
-        admin_user = "@refer_jabyum"
+        admin_user = get_admin_user()
         await message.bot.send_message(message.from_user.id,
                                        f"👥 Всего пользователей: {all_info[0]}\n"
                                        f"📤 Выплачено всего: {all_info[1]}",

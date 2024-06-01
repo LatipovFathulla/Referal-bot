@@ -29,10 +29,10 @@ def get_user_name(tg_id):
             return user.user_name
 
 
-def add_admin_info():
+def add_admin_info(admin):
     with next(get_db()) as db:
         # TODO вписать сюда айди админа
-        info = AdminInfo(id=1, admin_channel="t.me/refer_jabyum")
+        info = AdminInfo(id=1, admin_channel=admin)
         db.add(info)
         db.commit()
 def count_info():

@@ -4,15 +4,15 @@ from bot import bot_router
 from admin import admin_router
 from database import Base, engine
 # TODO токен
-bot = Bot(token="TOKEN")
+bot = Bot(token="7063912424:AAFMCaqgHIJwioHX9HP_Zj7j70uNqlf0RYU")
 dp = Dispatcher()
 Base.metadata.create_all(bind=engine)
 from database.otherservice import *
 
 # TODO это нужно убрать после теста
 try:
-    add_admin_info()
-    add_channel("t.me/refer_jabyum", -1002201370044)
+    add_admin_info("t.me/Dark_Just")
+    add_channel("https://t.me/JustCrypto_X", -1002110888721)
 except:
     pass
 

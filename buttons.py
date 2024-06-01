@@ -57,7 +57,7 @@ async def channels_in(all_channels):
 
 async def admin_in(admin_user):
     buttons = [
-        [InlineKeyboardButton(text="🧑‍💻Админ", url=f"t.me/{admin_user.replace('@', '')}")]
+        [InlineKeyboardButton(text="🧑‍💻Админ", url=admin_user)]
     ]
     kb = InlineKeyboardMarkup(inline_keyboard=buttons)
     return kb

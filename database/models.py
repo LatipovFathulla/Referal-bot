@@ -42,7 +42,7 @@ class AdminInfo(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     price = Column(Float, default=4.00)
     min_amount = Column(Float, default=60.00)
-    admin_channel = Column(Integer)
+    admin_channel = Column(String)
 
 
 

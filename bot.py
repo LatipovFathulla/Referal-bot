@@ -25,6 +25,7 @@ async def check_channels(message):
 
             except:
                 pass
+    check_and_add(tg_id=message.from_user.id)
     return True
 async def banned(message):
     check = check_ban(message.from_user.id)
@@ -47,8 +48,7 @@ async def start(message: Message, command: BotCommand = None):
         if inv_name:
             add_user(user_name=message.from_user.first_name, tg_id=message.from_user.id,
                      invited=inv_name, invited_id=inv_id)
-            plus_ref(inv_id)
-            plus_money(inv_id)
+            add_ref(tg_id=message.from_user.id, inv_id=inv_id)
             await message.bot.send_message(message.from_user.id, f"🎉Привет, {message.from_user.first_name}",
                                            reply_markup=await main_menu_bt())
         elif not inv_name:

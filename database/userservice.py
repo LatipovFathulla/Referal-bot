@@ -1,5 +1,5 @@
 from database import get_db
-from database.models import User, AdminInfo, Withdrawals
+from database.models import User, AdminInfo, Withdrawals, Checker
 from datetime import datetime
 
 def add_user(tg_id, user_name, invited="Никто", invited_id=None):
@@ -8,6 +8,15 @@ def add_user(tg_id, user_name, invited="Никто", invited_id=None):
                         reg_date=datetime.now())
         db.add(new_user)
         db.commit()
+
+def add_ref(tg_id, inv_id):
+    with next(get_db()) as db:
+        new_ref = Checker(tg_id=tg_id, inv_id=inv_id)
+        db.add(new_ref)
+        db.commit()
+
+
+
 
 def check_user(tg_id):
     with next(get_db()) as db:
@@ -63,4 +72,13 @@ def get_admin_user():
             return check.admin_channel
         return ""
 
+def check_and_add(tg_id):
+    with next(get_db()) as db:
+        check = db.query(Checker).filter_by(tg_id=tg_id).first()
+        if check:
+            if not check.add:
+                check.add = True
+                plus_ref(check.inv_id)
+                plus_money(check.inv_id)
+                db.commit()
 

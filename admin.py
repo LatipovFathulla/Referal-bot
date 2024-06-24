@@ -24,6 +24,7 @@ async def admin_mm(message: Message):
                                                              f"💶<b>Заявок на вывод</b>: {info[1]}", parse_mode="html",
                                        reply_markup= await admin_menu_in())
 
+
 @admin_router.callback_query(F.data.in_(["all_payments", "cancel", "none", "change_money", "change_min",
                                          "change_channels", "add_channel", "delete_channel", "mailing",
                                          "imp"]))
@@ -368,3 +369,7 @@ async def change_refs_amount(message: Message, state: FSMContext):
     else:
         await message.bot.send_message(message.from_user.id, "️️❗Ошибка", reply_markup=await main_menu_bt())
         await state.clear()
+@admin_router.message(F.text=="❌Отменить")
+async def profile(message: Message, state: FSMContext):
+    await message.bot.send_message(message.from_user.id, "️️Все действия отменены", reply_markup=await main_menu_bt())
+    await state.clear()

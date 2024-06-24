@@ -16,6 +16,14 @@ class User(Base):
     banned = Column(Boolean, default=False)
     reg_date = Column(DateTime)
 
+# в чистом проекте можно переделать чекер и добавить его в юзер
+class Checker(Base):
+    __tablename__ = "checker"
+    ref_id = Column(Integer, primary_key=True, autoincrement=True, unique=True)
+    tg_id = Column(Integer, unique=True)
+    inv_id = Column(Integer)
+    add = Column(Boolean, default=False)
+
 
 class Withdrawals(Base):
     __tablename__ = "withdrawal"
